@@ -11,37 +11,37 @@ export interface GroqModelConfig {
 
 export const GROQ_MODELS: Record<TaskCapability, GroqModelConfig> = {
   vision: {
-    modelId: 'llama-3.2-11b-vision-preview',
+    modelId: 'qwen/qwen3.8-27b',
     capability: 'vision',
-    displayName: 'Llama 3.2 11B Vision',
+    displayName: 'Qwen 3.8 27B Fast',
     maxTokens: 1024,
     temperature: 0.2,
   },
   llm: {
-    modelId: 'deepseek-r1-distill-llama-70b',
+    modelId: 'openai/gpt-oss-120b',
     capability: 'llm',
-    displayName: 'DeepSeek R1 Distill 70B',
-    maxTokens: 2048,
-    temperature: 0.6,
+    displayName: 'GPT OSS 120B (Groq)',
+    maxTokens: 1024,
+    temperature: 0.5,
   },
   code: {
-    modelId: 'llama-3.3-70b-versatile',
+    modelId: 'qwen/qwen3.8-27b',
     capability: 'code',
-    displayName: 'Llama 3.3 70B Versatile',
-    maxTokens: 2048,
+    displayName: 'Qwen 3.8 27B Versatile',
+    maxTokens: 1024,
     temperature: 0.2,
   },
   audio: {
-    modelId: 'whisper-large-v3',
+    modelId: 'whisper-large-v3-turbo',
     capability: 'audio',
-    displayName: 'Whisper Large v3',
+    displayName: 'Whisper Large v3 Turbo',
     maxTokens: 512,
     temperature: 0.0,
   },
   embeddings: {
-    modelId: 'llama-3.1-8b-instant',
+    modelId: 'openai/gpt-oss-20b',
     capability: 'embeddings',
-    displayName: 'Llama 3.1 8B Instant',
+    displayName: 'GPT OSS 20B Instant',
     maxTokens: 1024,
     temperature: 0.1,
   },
@@ -270,8 +270,12 @@ export async function executeWorkerJob(options: WorkerExecutionOptions): Promise
       }
 
       const data = await response.json();
-      outputText = data.choices?.[0]?.message?.content || '';
-      usedRealGroq = true;
+      const choice = data.choices?.[0];
+      outputText = (choice?.message?.content || choice?.message?.reasoning || '').trim();
+      if (!outputText && choice?.message) {
+        outputText = typeof choice.message === 'string' ? choice.message : JSON.stringify(choice.message);
+      }
+      usedRealGroq = Boolean(outputText);
     } catch (err: any) {
       console.warn('[GroqWorker] Real Groq call failed or blocked by CORS/limits, falling back:', err.message);
       outputText = generateFallbackOutput(capability, prompt);
