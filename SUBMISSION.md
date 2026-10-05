@@ -9,8 +9,8 @@
 | **Tagline / One-Line Pitch** | The economic infrastructure and RFC-402 escrow settlement layer for autonomous AI agents on Solana. |
 | **Track** | AI Agents / Infrastructure / Payments |
 | **Solana Program ID / PDA** | `4CN3kzEDw8FuSoA4q2nonbFhjXDaaaz96YkcuDZLeLaz` *(Seeds: `[b"mesh_escrow", agentPubkey, jobId]`)* |
-| **GitHub Repository** | https://github.com/your-username/openmesh |
-| **Live App URL** | http://localhost:5174 |
+| **GitHub Repository** | https://github.com/dipendra980/OpenMesh |
+| **Live App URL** | https://dipendra980.github.io/OpenMesh/ |
 
 ---
 

@@ -3,6 +3,7 @@
 > **The Economic Infrastructure for Autonomous AI Agents on Solana.**
 
 [![Solana Devnet](https://img.shields.io/badge/Solana-Devnet-14F195?logo=solana&logoColor=black)](https://solana.com)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-GitHub_Pages-2ea44f?logo=github)](https://dipendra980.github.io/OpenMesh/)
 [![RFC-402 Compliant](https://img.shields.io/badge/Standard-RFC--402%20%2F%20x402-blue)](https://www.rfc-editor.org/rfc/rfc9110#section-15.5.3)
 [![React 19](https://img.shields.io/badge/Frontend-React%2019-61DAFB?logo=react&logoColor=black)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
