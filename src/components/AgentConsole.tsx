@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   CheckCircle2, 
   AlertCircle,
@@ -20,8 +20,9 @@ import type {
 } from '../types';
 import { selectOptimalProvider } from '../lib/agentDecision';
 import type { ScoredProvider } from '../lib/agentDecision';
-import { executeInference } from '../lib/providers';
+import { executeWorkerJob } from '../lib/groqWorker';
 import { verifyInferenceWork } from '../lib/verification';
+import { realtimeHub, type RealtimeMeshEvent } from '../lib/realtimeHub';
 import { 
   sha256, 
   deriveEscrowPda, 
@@ -81,6 +82,100 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
     setLogs(prev => [...prev, newLog]);
   };
 
+  // Real-time synchronization with Worker instance
+  useEffect(() => {
+    const unsubscribe = realtimeHub.subscribe(async (event: RealtimeMeshEvent) => {
+      if (event.type === 'JOB_PROCESSING' && currentJob && currentJob.id === event.jobId) {
+        addLog('agent', `Remote Worker (${shortenAddress(event.workerPubkey, 4)}) claimed task. Processing Groq inference...`);
+        setCurrentJob(prev => prev ? { ...prev, status: 'inference_running' } : null);
+      } else if (event.type === 'JOB_RESULT_SUBMITTED' && currentJob && currentJob.id === event.job.id) {
+        addLog('agent', `Received signed result from Worker via Supabase Realtime!`);
+        await handleWorkerSubmittedResult(event.job);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [currentJob, providers, agentPolicy]);
+
+  const handleWorkerSubmittedResult = async (submittedJob: Job) => {
+    const chosenProvider = providers.find(p => p.id === submittedJob.providerId) || providers[0];
+    addLog('verify', `Running 6-Point Cryptographic Verification Gate on submitted output...`);
+
+    const verification = await verifyInferenceWork(
+      submittedJob,
+      chosenProvider,
+      submittedJob.outputResult || '',
+      submittedJob.providerSignature || '',
+      380,
+      false,
+      agentPolicy.vaultPda
+    );
+
+    if (!verification.checks.allPassed) {
+      const refundSig = generateSolanaSignature();
+      addLog('error', `VERIFICATION FAILED: ${verification.failureReason}`);
+      addLog('chain', `Executing claim_refund() on Escrow PDA: ${shortenAddress(submittedJob.escrowPda || '', 6)}`);
+      addLog('chain', `100% of funds refunded to Agent Vault. Signature: ${shortenAddress(refundSig, 6)}`);
+      addLog('agent', `Worker $100 stake bond slashed & reputation docked.`);
+
+      const failedJob: Job = {
+        ...submittedJob,
+        status: 'refunded',
+        verificationStatus: 'FAILED',
+        verificationChecks: verification.checks,
+        failureReason: verification.failureReason,
+        refundSignature: refundSig,
+        completedAt: new Date().toLocaleTimeString(),
+      };
+
+      setCurrentJob(failedJob);
+      onJobCompleted(failedJob);
+      realtimeHub.emit({ type: 'JOB_SLASHED', jobId: submittedJob.id, reason: verification.failureReason || '', refundSignature: refundSig });
+      setIsProcessing(false);
+      return;
+    }
+
+    addLog('verify', '✓ Point 1: Ed25519 Provider signature authenticated');
+    addLog('verify', '✓ Point 2: Escrow PDA seeds match');
+    addLog('verify', '✓ Point 3: Non-empty token density verified');
+    addLog('verify', '✓ Point 4: Schema conformance verified');
+    addLog('verify', '✓ Point 5: Latency SLA verified (<5000ms)');
+    addLog('verify', '✓ Point 6: SHA-256 digest invariant verified');
+    addLog('chain', `Releasing $${submittedJob.price.toFixed(4)} USDC from PDA to Worker wallet on Solana Devnet...`);
+
+    const completedJob: Job = {
+      ...submittedJob,
+      status: 'settled',
+      verificationStatus: 'PASSED',
+      verificationChecks: verification.checks,
+      completedAt: new Date().toLocaleTimeString(),
+    };
+
+    setCurrentJob(completedJob);
+    onJobCompleted(completedJob);
+    realtimeHub.emit({ type: 'JOB_SETTLED', jobId: submittedJob.id, signature: submittedJob.transactionSignature || '' });
+
+    setAgentPolicy(prev => ({
+      ...prev,
+      spentToday: prev.spentToday + submittedJob.price,
+    }));
+
+    setIsProcessing(false);
+
+    try {
+      confetti({
+        particleCount: 40,
+        spread: 50,
+        origin: { y: 0.75 },
+        colors: ['#14F195', '#EDEDED'],
+      });
+    } catch {
+      // safe fallback
+    }
+  };
+
   const runAutonomousWorkflow = async (
     customPrompt?: string, 
     customTaskType?: TaskCapability, 
@@ -117,7 +212,7 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
     };
     setCurrentJob(initialJob);
 
-    await new Promise(r => setTimeout(r, 350));
+    await new Promise(r => setTimeout(r, 250));
 
     addLog('agent', 'Scoring registered network nodes...');
     const decision = selectOptimalProvider(providers, activeTask, 1.0, priority);
@@ -147,6 +242,7 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
     };
     setCurrentJob(updatedJob);
 
+    // Policy Vault Threshold Check
     if (finalPrice > agentPolicy.autoApprovalLimit) {
       addLog('agent', `⚠️ Cost ($${finalPrice}) exceeds auto-approval ceiling ($${agentPolicy.autoApprovalLimit})`);
       addLog('agent', 'Requesting Master Wallet signature authorization...');
@@ -174,18 +270,19 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
     setIsProcessing(true);
 
     addLog('chain', `Initializing Escrow PDA: ${shortenAddress(job.escrowPda || '', 6)}`);
-    addLog('chain', `Locking $${job.price.toFixed(4)} USDC from Agent Vault...`);
+    addLog('chain', `Locking $${job.price.toFixed(4)} USDC from Agent Policy Vault...`);
     
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 350));
     const txSig = generateSolanaSignature();
     
-    setCurrentJob(prev => prev ? {
-      ...prev,
+    const lockedJob: Job = {
+      ...job,
       status: 'escrow_locked',
       transactionSignature: txSig,
-    } : null);
+    };
+    setCurrentJob(lockedJob);
 
-    addLog('chain', `Escrow locked on Devnet. Signature: ${shortenAddress(txSig, 6)}`);
+    addLog('chain', `Escrow locked on Solana Devnet. Signature: ${shortenAddress(txSig, 6)}`);
 
     setHttp402Detail({
       endpoint: `https://${provider.id}.openmesh.net/v1/inference`,
@@ -196,54 +293,67 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
       receiptHeader: txSig,
     });
 
-    addLog('agent', `Provider ${provider.name} accepted job. Running inference...`);
+    // Broadcast escrow_locked event to any listening Worker instance
+    realtimeHub.emit({ type: 'JOB_LOCKED', job: lockedJob });
+    addLog('agent', `Broadcasting task to decentralized Worker instances...`);
+
+    // Execute local sub-second solver (so single-window testing is instant)
     setCurrentJob(prev => prev ? { ...prev, status: 'inference_running' } : null);
 
-    const inferenceResult = await executeInference(provider, job.prompt, job.imageUrl, isChaosTest);
+    const workerResult = await executeWorkerJob({
+      jobId: job.id,
+      capability: job.taskType,
+      prompt: job.prompt,
+      imageUrl: job.imageUrl,
+      isChaosMode: isChaosTest,
+      chaosType: 'corrupt_signature',
+    });
 
-    setCurrentJob(prev => prev ? {
-      ...prev,
+    const receivedJob: Job = {
+      ...lockedJob,
       status: 'result_received',
-      outputResult: inferenceResult.output,
-      providerSignature: inferenceResult.providerSignature,
-    } : null);
+      outputResult: workerResult.outputText,
+      outputHash: workerResult.sha256Digest,
+      providerSignature: workerResult.ed25519Signature,
+      completedAt: new Date().toLocaleTimeString(),
+    };
+    setCurrentJob(receivedJob);
 
-    addLog('agent', `Inference finished in ${inferenceResult.latencyMs}ms`);
-    addLog('verify', `Validating Ed25519 payload signature...`);
+    addLog('agent', `Inference returned in ${workerResult.latencyMs}ms (${workerResult.usedRealGroq ? 'Groq Cloud' : 'High-Performance Engine'})`);
+    addLog('verify', `Evaluating 6-Point Cryptographic Verification Gate...`);
 
     setCurrentJob(prev => prev ? { ...prev, status: 'verifying' } : null);
-    await new Promise(r => setTimeout(r, 550));
+    await new Promise(r => setTimeout(r, 300));
 
     const verification = await verifyInferenceWork(
-      job, 
+      receivedJob, 
       provider, 
-      inferenceResult.output, 
-      inferenceResult.providerSignature, 
-      inferenceResult.latencyMs, 
-      isChaosTest
+      workerResult.outputText, 
+      workerResult.ed25519Signature, 
+      workerResult.latencyMs, 
+      isChaosTest,
+      agentPolicy.vaultPda
     );
 
     if (!verification.checks.allPassed) {
       const refundSig = generateSolanaSignature();
       addLog('error', `VERIFICATION FAILED: ${verification.failureReason}`);
       addLog('chain', `Executing claim_refund() on Escrow PDA: ${shortenAddress(job.escrowPda || '', 6)}`);
-      addLog('chain', `100% of funds refunded to Agent Vault. Signature: ${shortenAddress(refundSig, 6)}`);
-      addLog('agent', `Provider reputation docked -5 points.`);
+      addLog('chain', `100% of escrowed USDC refunded to Agent Vault. Signature: ${shortenAddress(refundSig, 6)}`);
+      addLog('agent', `Worker reputation docked -5 points & $100 stake bond slashed.`);
 
       const failedJob: Job = {
-        ...job,
+        ...receivedJob,
         status: 'refunded',
         verificationStatus: 'FAILED',
         verificationChecks: verification.checks,
-        outputResult: inferenceResult.output,
-        outputHash: verification.outputHash,
         failureReason: verification.failureReason,
         refundSignature: refundSig,
-        completedAt: new Date().toLocaleTimeString(),
       };
 
       setCurrentJob(failedJob);
       onJobCompleted(failedJob);
+      realtimeHub.emit({ type: 'JOB_SLASHED', jobId: job.id, reason: verification.failureReason || '', refundSignature: refundSig });
 
       setProviders(prev => prev.map(p => {
         if (p.id === provider.id) {
@@ -251,6 +361,7 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
             ...p,
             reputation: Math.max(0, p.reputation - 5),
             failedJobs: p.failedJobs + 1,
+            stakeBondAmount: Math.max(0, p.stakeBondAmount - 100),
           };
         }
         return p;
@@ -260,25 +371,25 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
       return;
     }
 
-    addLog('verify', '✓ Provider signature authenticated');
-    addLog('verify', '✓ SHA-256 output hash verified');
-    addLog('verify', '✓ Schema valid & latency within SLA');
+    addLog('verify', '✓ Point 1: Ed25519 Provider signature authenticated');
+    addLog('verify', '✓ Point 2: Escrow PDA deterministic seeds strictly match');
+    addLog('verify', '✓ Point 3: Non-empty token density verified (ghost work rejected)');
+    addLog('verify', '✓ Point 4: Structural schema conformance verified');
+    addLog('verify', '✓ Point 5: Latency SLA verified (< 5,000ms)');
+    addLog('verify', '✓ Point 6: Independent SHA-256 digest matches signed receipt');
     addLog('chain', `Executing settle_job() on Solana Devnet...`);
     addLog('chain', `Transferred $${job.price.toFixed(4)} USDC from PDA to Provider wallet`);
     
     const completedJob: Job = {
-      ...job,
+      ...receivedJob,
       status: 'settled',
       verificationStatus: 'PASSED',
       verificationChecks: verification.checks,
-      outputResult: inferenceResult.output,
-      outputHash: verification.outputHash,
-      providerSignature: inferenceResult.providerSignature,
-      completedAt: new Date().toLocaleTimeString(),
     };
 
     setCurrentJob(completedJob);
     onJobCompleted(completedJob);
+    realtimeHub.emit({ type: 'JOB_SETTLED', jobId: job.id, signature: txSig });
 
     setAgentPolicy(prev => ({
       ...prev,
@@ -364,7 +475,7 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
               Autonomous Vision-Language
             </h3>
             <p className="text-xs text-white/70 mt-1.5 leading-relaxed">
-              Auto-approved under the $0.10 limit. Zero Phantom popups, instant on-chain escrow lock and settlement.
+              Auto-approved under the $0.10 limit. Zero human popups, instant on-chain escrow lock and settlement.
             </p>
           </div>
 
@@ -551,10 +662,10 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
                   onChange={e => setTaskType(e.target.value as any)}
                   className="glass-input w-full rounded-xl px-3 py-2 text-xs text-white font-mono cursor-pointer"
                 >
-                  <option value="vision" className="bg-[#0A0B10]">Vision-Language</option>
-                  <option value="llm" className="bg-[#0A0B10]">Deep Reasoning</option>
-                  <option value="code" className="bg-[#0A0B10]">Coding Analysis</option>
-                  <option value="audio" className="bg-[#0A0B10]">Audio / Whisper</option>
+                  <option value="vision" className="bg-[#0A0B10]">Vision (Llama 3.2 11B)</option>
+                  <option value="llm" className="bg-[#0A0B10]">Reasoning (DeepSeek R1 70B)</option>
+                  <option value="code" className="bg-[#0A0B10]">Coding (Llama 3.3 70B)</option>
+                  <option value="audio" className="bg-[#0A0B10]">Audio (Whisper Large v3)</option>
                 </select>
               </div>
 
@@ -675,27 +786,27 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-white/[0.06] text-white/80">
                       <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/[0.02]">
                         <CheckCircle2 className={`w-3.5 h-3.5 flex-shrink-0 ${currentJob.verificationChecks.providerAuthenticated ? 'text-[#14F195]' : 'text-rose-400'}`} />
-                        <span>Ed25519 Provider Signature</span>
+                        <span>Point 1: Ed25519 Provider Signature</span>
                       </div>
                       <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/[0.02]">
                         <CheckCircle2 className={`w-3.5 h-3.5 flex-shrink-0 ${currentJob.verificationChecks.jobIdMatched ? 'text-[#14F195]' : 'text-rose-400'}`} />
-                        <span>Anchor Escrow PDA Match</span>
+                        <span>Point 2: Anchor Escrow PDA Match</span>
                       </div>
                       <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/[0.02]">
                         <CheckCircle2 className={`w-3.5 h-3.5 flex-shrink-0 ${currentJob.verificationChecks.outputReceived ? 'text-[#14F195]' : 'text-rose-400'}`} />
-                        <span>Non-Empty Payload Verified</span>
+                        <span>Point 3: Non-Empty Token Density</span>
                       </div>
                       <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/[0.02]">
                         <CheckCircle2 className={`w-3.5 h-3.5 flex-shrink-0 ${currentJob.verificationChecks.schemaValid ? 'text-[#14F195]' : 'text-rose-400'}`} />
-                        <span>RFC-402 JSON Schema Match</span>
+                        <span>Point 4: Structural Schema Conformance</span>
                       </div>
                       <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/[0.02]">
                         <CheckCircle2 className={`w-3.5 h-3.5 flex-shrink-0 ${currentJob.verificationChecks.latencyWithinSla ? 'text-[#14F195]' : 'text-rose-400'}`} />
-                        <span>Latency SLA Bound Satisfied</span>
+                        <span>Point 5: Latency SLA (&lt;5000ms)</span>
                       </div>
                       <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/[0.02]">
                         <CheckCircle2 className={`w-3.5 h-3.5 flex-shrink-0 ${currentJob.verificationChecks.sha256HashValid ? 'text-[#14F195]' : 'text-rose-400'}`} />
-                        <span>SHA-256 Digest Invariant</span>
+                        <span>Point 6: SHA-256 Digest Invariant</span>
                       </div>
                     </div>
                   )}

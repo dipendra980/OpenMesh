@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Header } from './components/Header';
+import { Header, type AppTab } from './components/Header';
 import { AgentConsole } from './components/AgentConsole';
+import { WorkerCockpit } from './components/WorkerCockpit';
 import { ProviderMarketplace } from './components/ProviderMarketplace';
-import { ProviderDashboard } from './components/ProviderDashboard';
 import { NetworkTelemetry } from './components/NetworkTelemetry';
 import { JobHistory } from './components/JobHistory';
 import { SchemaVisualizer } from './components/SchemaVisualizer';
@@ -19,7 +19,7 @@ import {
 const DEFAULT_MASTER_WALLET = '7rtTNBNqQ4N6NH5d5AdRFQYRsr5gz2q3ZVpgesGaZxpo';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'console' | 'marketplace' | 'provider' | 'network' | 'schema' | 'history'>('console');
+  const [activeTab, setActiveTab] = useState<AppTab>('console');
   
   // Wallet states
   const [walletConnected, setWalletConnected] = useState(true);
@@ -144,6 +144,8 @@ export function App() {
 
       {/* Main Content */}
       <main className="flex-1 max-w-[1200px] w-full mx-auto px-4 sm:px-6 lg:px-10 py-8 lg:py-12 relative z-10">
+        
+        {/* Tab 1: Agent / User Console */}
         {activeTab === 'console' && (
           <AgentConsole
             providers={providers}
@@ -156,20 +158,22 @@ export function App() {
           />
         )}
 
+        {/* Tab 2: Worker / GPU Operator Cockpit */}
+        {activeTab === 'worker' && (
+          <WorkerCockpit
+            provider={providers[0]}
+            onUpdateProvider={(updated) => {
+              setProviders(prev => prev.map(p => p.id === updated.id ? updated : p));
+            }}
+          />
+        )}
+
+        {/* Ecosystem Sub-Tabs */}
         {activeTab === 'marketplace' && (
           <ProviderMarketplace
             providers={providers}
             onSelectProvider={() => {
               setActiveTab('console');
-            }}
-          />
-        )}
-
-        {activeTab === 'provider' && (
-          <ProviderDashboard
-            provider={providers[0]}
-            onUpdateProvider={(updated) => {
-              setProviders(prev => prev.map(p => p.id === updated.id ? updated : p));
             }}
           />
         )}
@@ -193,14 +197,14 @@ export function App() {
         <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <span className="w-2 h-2 rounded-full bg-[#14F195] shadow-[0_0_8px_#14F195]" />
-            <span className="text-white/80 font-medium">OpenMesh Protocol v1.0.4 · Solana Devnet</span>
+            <span className="text-white/80 font-medium font-display">OpenMesh Protocol v1.1.0 · Solana Devnet</span>
           </div>
           <div className="flex items-center gap-3 text-slate-400 text-[11px]">
-            <span>RFC-402 Compliant</span>
+            <span>Groq Cloud Sub-Second</span>
             <span>·</span>
-            <span>Ed25519 Verified</span>
+            <span>Ed25519 Signatures</span>
             <span>·</span>
-            <span>Supabase Connected</span>
+            <span>Supabase Realtime</span>
             <span>·</span>
             <span>Session Key Vault</span>
           </div>

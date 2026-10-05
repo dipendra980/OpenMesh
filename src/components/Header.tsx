@@ -5,14 +5,18 @@ import {
   ShieldCheck, 
   ExternalLink, 
   Radio, 
-  SlidersHorizontal
+  SlidersHorizontal,
+  Bot,
+  Server
 } from 'lucide-react';
 import { shortenAddress, getSolanaExplorerUrl } from '../lib/solana';
 import type { AgentPolicy } from '../types';
 
+export type AppTab = 'console' | 'worker' | 'marketplace' | 'network' | 'schema' | 'history';
+
 interface HeaderProps {
-  activeTab: 'console' | 'marketplace' | 'provider' | 'network' | 'schema' | 'history';
-  setActiveTab: (tab: 'console' | 'marketplace' | 'provider' | 'network' | 'schema' | 'history') => void;
+  activeTab: AppTab;
+  setActiveTab: (tab: AppTab) => void;
   walletConnected: boolean;
   walletAddress: string;
   solBalance: number;
@@ -53,7 +57,7 @@ export const Header: React.FC<HeaderProps> = ({
               <Cpu className="w-4 h-4 text-[#14F195]" />
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="font-bold text-base tracking-tight text-white">
+              <span className="font-bold text-base tracking-tight text-white font-display">
                 OpenMesh
               </span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/[0.06] text-white/70 border border-white/[0.14]">
@@ -72,22 +76,47 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Center Nav */}
-        <nav className="flex items-center gap-1 bg-white/[0.04] backdrop-blur-[20px] p-1 rounded-full border border-white/[0.14] shadow-lg overflow-x-auto max-w-full">
+        <nav className="flex items-center gap-1 bg-white/[0.04] backdrop-blur-[20px] p-1.5 rounded-full border border-white/[0.14] shadow-lg overflow-x-auto max-w-full">
+          <button
+            onClick={() => setActiveTab('console')}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs transition-all whitespace-nowrap cursor-pointer ${
+              activeTab === 'console'
+                ? 'bg-white text-[#0A0B10] font-bold shadow-md scale-[1.02]'
+                : 'text-white/70 hover:text-white hover:bg-white/[0.08]'
+            }`}
+          >
+            <Bot className="w-3.5 h-3.5" />
+            <span>Agent Console</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('worker')}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs transition-all whitespace-nowrap cursor-pointer ${
+              activeTab === 'worker'
+                ? 'bg-white text-[#0A0B10] font-bold shadow-md scale-[1.02]'
+                : 'text-white/70 hover:text-white hover:bg-white/[0.08]'
+            }`}
+          >
+            <Server className="w-3.5 h-3.5" />
+            <span>Worker Cockpit</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#14F195] ml-0.5 animate-pulse" />
+          </button>
+
+          <div className="h-4 w-px bg-white/20 mx-1 hidden sm:block" />
+
           {[
-            { id: 'console', label: 'Agent Console' },
             { id: 'marketplace', label: 'Marketplace' },
-            { id: 'provider', label: 'Node Operator' },
             { id: 'network', label: 'Telemetry' },
             { id: 'schema', label: 'Schema ERD' },
             { id: 'history', label: 'Solana Ledger' },
           ].map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`px-3.5 py-1.5 rounded-full text-xs transition-all whitespace-nowrap ${
+              onClick={() => setActiveTab(tab.id as AppTab)}
+              className={`px-3.5 py-1.5 rounded-full text-xs transition-all whitespace-nowrap cursor-pointer ${
                 activeTab === tab.id
-                  ? 'bg-white text-[#0A0B10] font-semibold shadow-md scale-[1.02]'
-                  : 'text-white/70 hover:text-white hover:bg-white/[0.08]'
+                  ? 'bg-white/20 text-white font-semibold'
+                  : 'text-white/50 hover:text-white hover:bg-white/[0.06]'
               }`}
             >
               {tab.label}
