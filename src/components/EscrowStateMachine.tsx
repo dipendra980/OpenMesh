@@ -56,88 +56,93 @@ export const EscrowStateMachine: React.FC<EscrowStateMachineProps> = ({
   const currentIndex = getStepIndex(status);
 
   return (
-    <div className="linear-card rounded-xl p-4 w-full">
+    <div className="glass-card p-8 rounded-[28px] w-full text-left space-y-6">
       {/* Header bar */}
-      <div className="flex items-center justify-between mb-4 pb-2.5 border-b border-white/[0.06]">
-        <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#14F195]" />
-          <span className="text-xs font-mono font-medium tracking-tight text-white uppercase">
-            Escrow State Machine
-          </span>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-white/[0.08] gap-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#14F195] shadow-[0_0_8px_#14F195]" />
+            <span className="tag-label">Autonomous State Protocol</span>
+          </div>
+          <h3 className="text-base font-semibold text-white tracking-tight mt-0.5">
+            Solana On-Chain Micro-Escrow Pipeline
+          </h3>
         </div>
 
-        <div className="text-[11px] font-mono">
+        <div>
           {status === 'settled' ? (
-            <span className="text-[#14F195] font-medium flex items-center gap-1">
+            <span className="pill-chip bg-[#14F195]/15 border-[#14F195]/30 text-[#14F195] font-semibold shadow-[0_0_12px_rgba(20,241,149,0.2)]">
               <Check className="w-3 h-3 stroke-[3]" /> Escrow Settled
             </span>
           ) : isRefunded || status === 'refunded' ? (
-            <span className="text-rose-400 font-medium flex items-center gap-1">
-              <RotateCcw className="w-3 h-3" /> Auto-Refunded
+            <span className="pill-chip bg-rose-500/15 border-rose-500/30 text-rose-400 font-semibold shadow-[0_0_12px_rgba(244,63,94,0.2)]">
+              <RotateCcw className="w-3 h-3" /> Auto-Refunded (100%)
             </span>
           ) : status === 'awaiting_approval' ? (
-            <span className="text-amber-400 font-medium">
+            <span className="pill-chip bg-amber-500/15 border-amber-500/30 text-amber-400 font-semibold shadow-[0_0_12px_rgba(245,158,11,0.2)]">
               Waiting for Master Signature
             </span>
           ) : currentIndex >= 0 ? (
-            <span className="text-slate-300 flex items-center gap-1.5">
+            <span className="pill-chip bg-white/[0.08] border-white/20 text-white font-medium">
               <Loader2 className="w-3 h-3 text-[#14F195] animate-spin" />
               <span>Step {currentIndex + 1} of 7</span>
             </span>
           ) : (
-            <span className="text-slate-500">Standby</span>
+            <span className="pill-chip bg-white/[0.04] text-white/50 border-white/[0.08]">
+              Standby / Idle
+            </span>
           )}
         </div>
       </div>
 
       {/* Horizontal Steps Layout */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
         {STEPS.map((step, idx) => {
           const isPassed = currentIndex > idx || (status === 'settled' && idx === 6);
           const isCurrent = currentIndex === idx && status !== 'settled';
           const isFailed = (isRefunded || status === 'refunded') && idx === 6;
 
-          let stepBg = 'bg-[#0A0B10] border-white/[0.04] text-slate-500';
-          let indicatorBg = 'border-white/10 text-slate-600 bg-white/[0.02]';
+          let stepBg = 'bg-white/[0.02] border-white/[0.08] text-white/50';
+          let indicatorBg = 'border-white/10 text-white/40 bg-white/[0.04]';
 
           if (isPassed) {
-            stepBg = 'bg-[#14F195]/[0.03] border-[#14F195]/20 text-slate-200';
-            indicatorBg = 'bg-[#14F195]/20 border-[#14F195]/40 text-[#14F195]';
+            stepBg = 'bg-[#14F195]/[0.06] border-[#14F195]/30 text-white shadow-[0_0_16px_rgba(20,241,149,0.08)]';
+            indicatorBg = 'bg-[#14F195] border-[#14F195] text-black shadow-[0_0_10px_#14F195]';
           } else if (isCurrent) {
-            stepBg = 'bg-white/[0.04] border-white/20 text-white';
-            indicatorBg = 'bg-white border-white text-black';
+            stepBg = 'bg-white/[0.08] border-white/40 text-white shadow-[0_0_20px_rgba(255,255,255,0.12)] scale-[1.02]';
+            indicatorBg = 'bg-white border-white text-black shadow-[0_0_10px_#FFF]';
           } else if (isFailed) {
-            stepBg = 'bg-rose-500/[0.04] border-rose-500/20 text-rose-300';
-            indicatorBg = 'bg-rose-500/20 border-rose-500/40 text-rose-400';
+            stepBg = 'bg-rose-500/[0.08] border-rose-500/30 text-rose-300 shadow-[0_0_16px_rgba(244,63,94,0.1)]';
+            indicatorBg = 'bg-rose-500 border-rose-500 text-white shadow-[0_0_10px_#F43F5E]';
           }
 
           return (
             <div
               key={step.key}
-              className={`p-2.5 rounded-lg border flex flex-col justify-between transition-colors ${stepBg}`}
+              className={`p-3.5 rounded-2xl border flex flex-col justify-between transition-all backdrop-blur-md ${stepBg}`}
             >
-              <div className="flex items-center justify-between mb-2">
-                <div className={`w-5 h-5 rounded-full border flex items-center justify-center text-[10px] font-mono font-bold transition-all ${indicatorBg}`}>
+              <div className="flex items-center justify-between mb-3">
+                <div className={`w-6 h-6 rounded-full border flex items-center justify-center text-[10px] font-mono font-bold transition-all ${indicatorBg}`}>
                   {isPassed ? (
-                    <Check className="w-3 h-3 stroke-[3]" />
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
                   ) : isCurrent ? (
-                    <Loader2 className="w-2.5 h-2.5 animate-spin text-black" />
+                    <Loader2 className="w-3 h-3 animate-spin text-black" />
                   ) : isFailed ? (
-                    <RotateCcw className="w-2.5 h-2.5" />
+                    <RotateCcw className="w-3 h-3" />
                   ) : (
                     <span>{idx + 1}</span>
                   )}
                 </div>
-                <span className="text-[10px] font-mono text-slate-600">
+                <span className="text-[10px] font-mono text-white/40">
                   0{idx + 1}
                 </span>
               </div>
 
               <div>
-                <div className="text-[11px] font-medium tracking-tight text-slate-200 leading-tight">
+                <div className="text-xs font-semibold tracking-tight text-white leading-tight">
                   {step.title}
                 </div>
-                <div className="text-[10px] font-mono text-slate-500 mt-0.5 truncate">
+                <div className="text-[10px] font-mono text-white/50 mt-1 truncate">
                   {step.subtitle}
                 </div>
               </div>

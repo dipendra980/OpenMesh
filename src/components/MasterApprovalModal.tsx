@@ -25,88 +25,88 @@ export const MasterApprovalModal: React.FC<MasterApprovalModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="linear-card w-full max-w-md rounded-xl p-5 text-left relative shadow-2xl space-y-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-200">
+      <div className="glass-modal w-full max-w-lg p-8 text-left relative shadow-2xl space-y-6">
         
         {/* Header */}
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
-              Approval Required
+          <div className="flex items-center gap-2 mb-2">
+            <span className="pill-chip bg-amber-500/15 border-amber-500/30 text-amber-400 font-semibold shadow-[0_0_12px_rgba(245,158,11,0.2)]">
+              Approval Escalation Triggered
             </span>
           </div>
-          <h3 className="text-base font-semibold text-white">
+          <h3 className="text-xl font-bold text-white tracking-tight">
             Autonomous Policy Threshold Exceeded
           </h3>
-          <p className="text-xs text-slate-400 mt-0.5">
-            This job exceeds the configured auto-approval limit and requires your signature.
+          <p className="text-xs text-white/70 mt-1 leading-relaxed">
+            This job exceeds the configured auto-approval limit and requires your Master Wallet signature authorization.
           </p>
         </div>
 
         {/* Task description preview */}
-        <div className="p-2.5 rounded-lg bg-[#0A0B10] border border-white/[0.04] text-[11px] text-slate-300 font-mono truncate">
-          <span className="text-slate-500 mr-1.5">TASK:</span>
+        <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.10] text-xs text-white/90 font-mono truncate">
+          <span className="text-white/40 mr-2">TASK:</span>
           <span>{taskTitle}</span>
         </div>
 
         {/* Cost Comparison */}
-        <div className="bg-[#0A0B10] border border-white/[0.06] rounded-lg p-3 font-mono text-xs space-y-2">
+        <div className="bg-white/[0.03] border border-white/[0.10] rounded-2xl p-5 font-mono text-xs space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-slate-400">ESTIMATED COST:</span>
-            <span className="text-base font-bold text-amber-400">
+            <span className="text-white/60">ESTIMATED COST:</span>
+            <span className="text-lg font-bold text-amber-400">
               ${jobCost.toFixed(4)} USDC
             </span>
           </div>
 
-          <div className="flex items-center justify-between text-slate-400 border-t border-white/[0.04] pt-1.5">
+          <div className="flex items-center justify-between text-white/60 border-t border-white/[0.06] pt-2">
             <span>AUTO CEILING:</span>
-            <span className="text-slate-300 font-medium">${autoLimit.toFixed(2)} USDC</span>
+            <span className="text-white font-medium">${autoLimit.toFixed(2)} USDC</span>
           </div>
 
-          <div className="flex items-center justify-between text-slate-400 border-t border-white/[0.04] pt-1.5">
+          <div className="flex items-center justify-between text-white/60 border-t border-white/[0.06] pt-2">
             <span>TARGET NODE:</span>
             <span className="text-white font-medium">{provider.name}</span>
           </div>
 
-          <div className="flex items-center justify-between text-slate-400 border-t border-white/[0.04] pt-1.5">
+          <div className="flex items-center justify-between text-white/60 border-t border-white/[0.06] pt-2">
             <span>WALLET:</span>
             <a
               href={getSolanaExplorerUrl(provider.walletAddress, 'address')}
               target="_blank"
               rel="noreferrer"
-              className="text-[#14F195] hover:underline flex items-center gap-1"
+              className="text-[#14F195] hover:underline flex items-center gap-1.5"
             >
               <span>{shortenAddress(provider.walletAddress, 4)}</span>
-              <ExternalLink className="w-2.5 h-2.5" />
+              <ExternalLink className="w-3 h-3" />
             </a>
           </div>
         </div>
 
         {/* Notice */}
-        <div className="flex items-start gap-2 p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.04] text-[11px] text-slate-400">
-          <AlertCircle className="w-3.5 h-3.5 text-amber-400 mt-0.5 flex-shrink-0" />
+        <div className="flex items-start gap-2.5 p-3.5 rounded-2xl bg-amber-500/[0.08] border border-amber-500/20 text-xs text-amber-200/90 leading-relaxed">
+          <AlertCircle className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
           <span>
-            Signing authorizes creating a Solana Devnet Escrow PDA for ${jobCost.toFixed(4)} USDC. Funds release only upon successful verification.
+            Signing authorizes creating a Solana Devnet Escrow PDA for ${jobCost.toFixed(4)} USDC. Funds release only upon successful cryptographic verification.
           </span>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-white/[0.06]">
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/[0.08]">
           <button
             onClick={onReject}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs text-slate-400 hover:text-white transition-colors"
+            className="pill-ghost text-xs py-2.5 px-5 cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
-            <span>Reject</span>
+            <span>Reject Task</span>
           </button>
           
           <button
             onClick={onApprove}
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-md bg-white text-black font-semibold text-xs hover:bg-slate-200 transition-colors"
+            className="pill-cta text-xs py-3 px-6 cursor-pointer"
           >
             <Check className="w-3.5 h-3.5 stroke-[3]" />
             <span>Approve & Lock Escrow</span>
-            <ArrowRight className="w-3 h-3" />
+            <ArrowRight className="w-3 h-3 ml-1" />
           </button>
         </div>
 

@@ -117,10 +117,14 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#08090D] text-[#EDEDED] flex flex-col selection:bg-[#14F195]/20 selection:text-[#14F195] relative">
+    <div className="min-h-screen bg-[#07080e] text-[#EDEDED] flex flex-col selection:bg-[#14F195]/20 selection:text-[#14F195] relative overflow-x-hidden">
       
-      {/* Ambient subtle top glow */}
-      <div className="ambient-glow-top" />
+      {/* Atmospheric Gradient Mesh (Underlay) */}
+      <div className="ambient-mesh" aria-hidden="true">
+        <div className="glow-cyan" />
+        <div className="glow-violet" />
+        <div className="glow-rose" />
+      </div>
 
       {/* Header */}
       <Header
@@ -139,7 +143,7 @@ export function App() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-7 relative z-10">
+      <main className="flex-1 max-w-[1200px] w-full mx-auto px-4 sm:px-6 lg:px-10 py-8 lg:py-12 relative z-10">
         {activeTab === 'console' && (
           <AgentConsole
             providers={providers}
@@ -184,13 +188,14 @@ export function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.06] py-5 px-4 text-center text-xs font-mono text-slate-500 relative z-10">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#14F195]" />
-            <span>OpenMesh Protocol v1.0.4 · Solana Devnet</span>
+      <footer className="relative z-10 py-8 px-4 sm:px-6 lg:px-10 text-xs font-mono text-slate-400">
+        <div className="hairline-divider mb-6 max-w-[1200px] mx-auto" />
+        <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2 h-2 rounded-full bg-[#14F195] shadow-[0_0_8px_#14F195]" />
+            <span className="text-white/80 font-medium">OpenMesh Protocol v1.0.4 · Solana Devnet</span>
           </div>
-          <div className="flex items-center gap-3 text-slate-500 text-[11px]">
+          <div className="flex items-center gap-3 text-slate-400 text-[11px]">
             <span>RFC-402 Compliant</span>
             <span>·</span>
             <span>Ed25519 Verified</span>

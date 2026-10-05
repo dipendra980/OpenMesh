@@ -50,53 +50,54 @@ export const ProviderMarketplace: React.FC<ProviderMarketplaceProps> = ({
   });
 
   return (
-    <div className="space-y-5 text-left">
+    <div className="space-y-8 text-left">
       
       {/* Header bar */}
-      <div className="linear-card rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="glass-card p-8 rounded-[28px] flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <div className="flex items-center gap-2">
-            <Server className="w-4 h-4 text-slate-300" />
-            <h2 className="text-base font-semibold text-white tracking-tight">
-              Inference Provider Directory
-            </h2>
+            <Server className="w-4 h-4 text-[#14F195]" />
+            <span className="tag-label">DePIN Compute Nodes</span>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Registered GPU nodes with on-chain stake bonds available for autonomous M2M routing
+          <h2 className="text-xl font-bold text-white tracking-tight mt-1">
+            Inference Provider Marketplace
+          </h2>
+          <p className="text-xs text-white/70 mt-1 leading-relaxed">
+            Registered GPU nodes with on-chain stake bonds available for autonomous RFC-402 micro-routing
           </p>
         </div>
 
         {/* Search & Sort */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="relative min-w-[220px]">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative min-w-[240px]">
+            <Search className="w-4 h-4 text-white/40 absolute left-4 top-3" />
             <input
               type="text"
               placeholder="Search GPU or model..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="linear-input rounded-md pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 font-sans w-full"
+              className="glass-input rounded-full pl-11 pr-4 py-2.5 text-xs text-white placeholder-white/40 w-full"
             />
           </div>
 
-          <div className="flex items-center gap-1.5 linear-input rounded-md px-2.5 py-1.5 text-xs">
-            <ArrowUpDown className="w-3 h-3 text-slate-500" />
+          <div className="flex items-center gap-2 glass-input rounded-full px-4 py-2.5 text-xs">
+            <ArrowUpDown className="w-3.5 h-3.5 text-white/50" />
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value as any)}
-              className="bg-transparent text-slate-300 focus:outline-none font-mono text-xs cursor-pointer"
+              className="bg-transparent text-white focus:outline-none font-mono text-xs cursor-pointer"
             >
-              <option value="value" className="bg-[#0E1017]">Sort: Best Value</option>
-              <option value="price" className="bg-[#0E1017]">Sort: Lowest Price</option>
-              <option value="latency" className="bg-[#0E1017]">Sort: Lowest Latency</option>
-              <option value="reputation" className="bg-[#0E1017]">Sort: Highest Reputation</option>
+              <option value="value" className="bg-[#0A0B10]">Sort: Best Value</option>
+              <option value="price" className="bg-[#0A0B10]">Sort: Lowest Price</option>
+              <option value="latency" className="bg-[#0A0B10]">Sort: Lowest Latency</option>
+              <option value="reputation" className="bg-[#0A0B10]">Sort: Highest Reputation</option>
             </select>
           </div>
         </div>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+      <div className="flex items-center gap-2 overflow-x-auto pb-1">
         {[
           { id: 'all', label: 'All Models' },
           { id: 'vision', label: 'Vision-Language' },
@@ -108,10 +109,10 @@ export const ProviderMarketplace: React.FC<ProviderMarketplaceProps> = ({
           <button
             key={cat.id}
             onClick={() => setFilterCapability(cat.id)}
-            className={`px-3 py-1 rounded-md text-xs font-mono transition-colors whitespace-nowrap ${
+            className={`px-4 py-2 rounded-full text-xs font-mono transition-all whitespace-nowrap cursor-pointer ${
               filterCapability === cat.id
-                ? 'bg-white/10 text-white font-medium border border-white/20'
-                : 'bg-white/[0.02] text-slate-400 border border-white/[0.04] hover:text-white hover:bg-white/[0.05]'
+                ? 'bg-white text-[#0A0B10] font-bold shadow-md scale-[1.02]'
+                : 'pill-chip text-white/70 hover:text-white'
             }`}
           >
             {cat.label}
@@ -120,36 +121,36 @@ export const ProviderMarketplace: React.FC<ProviderMarketplaceProps> = ({
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filtered.map(provider => {
           const isRogue = provider.id === 'provider-epsilon';
 
           return (
             <div
               key={provider.id}
-              className={`linear-card rounded-xl p-4.5 flex flex-col justify-between transition-colors ${
-                isRogue ? 'border-rose-500/20' : ''
+              className={`glass-card-interactive p-7 rounded-[28px] flex flex-col justify-between ${
+                isRogue ? 'border-rose-500/30' : ''
               }`}
             >
               <div>
-                <div className="flex items-start justify-between gap-2 mb-3">
+                <div className="flex items-start justify-between gap-2 mb-4">
                   <div>
-                    <span className="font-semibold text-sm text-white block">
+                    <span className="font-bold text-base text-white block tracking-tight">
                       {provider.name}
                     </span>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className={`w-1.5 h-1.5 rounded-full ${
-                        provider.status === 'ONLINE' ? 'bg-[#14F195]' : 'bg-slate-500'
+                      <span className={`w-2 h-2 rounded-full ${
+                        provider.status === 'ONLINE' ? 'bg-[#14F195] shadow-[0_0_8px_#14F195]' : 'bg-slate-500'
                       }`} />
-                      <span className="text-[11px] font-mono text-slate-400">
+                      <span className="text-[11px] font-mono text-white/70">
                         {provider.status}
                       </span>
-                      <span className="text-slate-600">·</span>
+                      <span className="text-white/20">·</span>
                       <a
                         href={getSolanaExplorerUrl(provider.walletAddress, 'address')}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-[11px] font-mono text-slate-500 hover:text-slate-300 flex items-center gap-0.5"
+                        className="text-[11px] font-mono text-white/60 hover:text-white flex items-center gap-1"
                       >
                         <span>{shortenAddress(provider.walletAddress, 4)}</span>
                         <ExternalLink className="w-2.5 h-2.5" />
@@ -157,22 +158,22 @@ export const ProviderMarketplace: React.FC<ProviderMarketplaceProps> = ({
                     </div>
                   </div>
 
-                  <span className="text-[11px] font-mono font-medium px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.06] text-slate-300">
+                  <span className="pill-chip font-bold text-white text-xs">
                     {provider.reputation}/100
                   </span>
                 </div>
 
                 {/* Specs */}
-                <div className="bg-[#0A0B10] border border-white/[0.04] rounded-lg p-2.5 mb-3.5 space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs font-mono text-slate-300">
-                    <Cpu className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-                    <span className="truncate">{provider.gpu}</span>
+                <div className="bg-white/[0.03] border border-white/[0.10] rounded-2xl p-4 mb-4 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-mono text-white/90">
+                    <Cpu className="w-4 h-4 text-[#14F195] flex-shrink-0" />
+                    <span className="truncate font-semibold">{provider.gpu}</span>
                   </div>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-1.5 pt-1">
                     {provider.models.map((m, i) => (
                       <span
                         key={i}
-                        className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.03] text-slate-400"
+                        className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/[0.05] border border-white/[0.08] text-white/70"
                       >
                         {m}
                       </span>

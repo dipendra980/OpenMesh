@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { 
   CheckCircle2, 
+  AlertCircle,
   ShieldCheck, 
   ExternalLink, 
   Image as ImageIcon, 
@@ -328,59 +329,99 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
     setIsProcessing(false);
   };
 
+  const isPromptEmpty = prompt.trim().length === 0;
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
       
-      {/* Sleek One-Click Demo Scenarios */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+      {/* High-End Frosted Glass Demo Scenarios */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        {/* Scenario 1: Autonomous Vision */}
         <button
           disabled={isProcessing}
           onClick={() => {
-            setPrompt('Analyze this image and identify the objects, scene, and important details.');
+            setPrompt('Analyze this high-resolution urban camera feed for obstacle identification.');
             setImageUrl(SAMPLE_IMAGE_URL);
             setTaskType('vision');
-            runAutonomousWorkflow('Analyze this image and identify the objects, scene, and important details.', 'vision', 0.005);
+            runAutonomousWorkflow('Analyze this high-resolution urban camera feed for obstacle identification.', 'vision', 0.005);
           }}
-          className="linear-card-interactive rounded-xl p-3.5 text-left flex items-start justify-between gap-3 group"
+          className="glass-card-interactive p-7 text-left flex flex-col justify-between group cursor-pointer relative overflow-hidden"
         >
           <div>
-            <div className="flex items-center gap-1.5 font-medium text-xs text-white">
-              <span>Autonomous Vision</span>
-              <span className="text-[10px] font-mono text-[#14F195] bg-[#14F195]/10 px-1.5 py-0.2 rounded border border-[#14F195]/20">
-                $0.005
-              </span>
+            <div className="flex items-center justify-between">
+              <span className="tag-label">Scenario 01 · Autonomous</span>
+              <span className="w-2 h-2 rounded-full bg-[#14F195] shadow-[0_0_8px_#14F195]" />
             </div>
-            <p className="text-[11px] text-slate-400 mt-1 leading-snug">
-              Auto-approved under $0.10 limit. Locks escrow, executes & settles.
+            
+            <div className="flex items-baseline gap-1 my-3">
+              <span className="currency-sym">$</span>
+              <span className="metric-val text-4xl lg:text-5xl">0.005</span>
+              <span className="metric-unit">USDC</span>
+            </div>
+
+            <h3 className="font-semibold text-sm text-white tracking-tight">
+              Autonomous Vision-Language
+            </h3>
+            <p className="text-xs text-white/70 mt-1.5 leading-relaxed">
+              Auto-approved under the $0.10 limit. Zero Phantom popups, instant on-chain escrow lock and settlement.
             </p>
           </div>
-          <ArrowRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-white transition-colors mt-0.5 flex-shrink-0" />
+
+          <div className="pt-4 border-t border-white/[0.08] mt-4 flex items-center justify-between">
+            <span className="pill-ghost text-[11px] py-1.5 px-3.5 group-hover:bg-white group-hover:text-[#0A0B10] transition-all">
+              <span>Execute Scenario</span>
+              <ArrowRight className="w-3 h-3 ml-1 group-hover:translate-x-0.5 transition-transform" />
+            </span>
+            <span className="text-[10px] font-mono text-[#14F195] bg-[#14F195]/10 px-2 py-0.5 rounded-full border border-[#14F195]/20">
+              100% Autonomous
+            </span>
+          </div>
         </button>
 
+        {/* Scenario 2: Policy Escalation */}
         <button
           disabled={isProcessing}
           onClick={() => {
-            const textPrompt = 'Perform deep multi-modal reasoning and synthesis across architectural data.';
+            const textPrompt = 'Perform deep multi-modal reasoning and synthesis across proprietary architectural data.';
             setPrompt(textPrompt);
             setTaskType('llm');
             runAutonomousWorkflow(textPrompt, 'llm', 0.45);
           }}
-          className="linear-card-interactive rounded-xl p-3.5 text-left flex items-start justify-between gap-3 group"
+          className="glass-card-interactive p-7 text-left flex flex-col justify-between group cursor-pointer relative overflow-hidden"
         >
           <div>
-            <div className="flex items-center gap-1.5 font-medium text-xs text-white">
-              <span>Policy Escalation</span>
-              <span className="text-[10px] font-mono text-amber-400 bg-amber-500/10 px-1.5 py-0.2 rounded border border-amber-500/20">
-                $0.450
-              </span>
+            <div className="flex items-center justify-between">
+              <span className="tag-label text-amber-300/80">Scenario 02 · Escalation</span>
+              <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#F59E0B]" />
             </div>
-            <p className="text-[11px] text-slate-400 mt-1 leading-snug">
-              Exceeds ceiling. Pauses for human Master Wallet authorization.
+            
+            <div className="flex items-baseline gap-1 my-3">
+              <span className="currency-sym text-amber-400">$</span>
+              <span className="metric-val text-amber-400 text-4xl lg:text-5xl">0.450</span>
+              <span className="metric-unit text-amber-300/60">USDC</span>
+            </div>
+
+            <h3 className="font-semibold text-sm text-white tracking-tight">
+              Spending Ceiling Escalation
+            </h3>
+            <p className="text-xs text-white/70 mt-1.5 leading-relaxed">
+              Cost exceeds the $0.10 session limit. Pauses execution and requests Master Wallet cryptographic authorization.
             </p>
           </div>
-          <ArrowRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-white transition-colors mt-0.5 flex-shrink-0" />
+
+          <div className="pt-4 border-t border-white/[0.08] mt-4 flex items-center justify-between">
+            <span className="pill-ghost text-[11px] py-1.5 px-3.5 group-hover:bg-amber-400 group-hover:text-black transition-all">
+              <span>Trigger Escalation</span>
+              <ArrowRight className="w-3 h-3 ml-1 group-hover:translate-x-0.5 transition-transform" />
+            </span>
+            <span className="text-[10px] font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+              Human In The Loop
+            </span>
+          </div>
         </button>
 
+        {/* Scenario 3: Chaos Monkey Slashing */}
         <button
           disabled={isProcessing}
           onClick={() => {
@@ -389,76 +430,112 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
             setTaskType('vision');
             runAutonomousWorkflow(textPrompt, 'vision', 0.001, true);
           }}
-          className="linear-card-interactive rounded-xl p-3.5 text-left flex items-start justify-between gap-3 group"
+          className="glass-card-interactive p-7 text-left flex flex-col justify-between group cursor-pointer relative overflow-hidden"
         >
           <div>
-            <div className="flex items-center gap-1.5 font-medium text-xs text-white">
-              <span>Chaos Slashing Test</span>
-              <span className="text-[10px] font-mono text-rose-400 bg-rose-500/10 px-1.5 py-0.2 rounded border border-rose-500/20">
-                Auto-Refund
-              </span>
+            <div className="flex items-center justify-between">
+              <span className="tag-label text-rose-300/80">Scenario 03 · Adversarial</span>
+              <span className="w-2 h-2 rounded-full bg-rose-400 shadow-[0_0_8px_#F43F5E]" />
             </div>
-            <p className="text-[11px] text-slate-400 mt-1 leading-snug">
-              Rogue node fails check. Escrow halts payment & slashes reputation.
+            
+            <div className="flex items-baseline gap-1 my-3">
+              <span className="metric-val text-rose-400 text-3xl lg:text-4xl">REFUND</span>
+              <span className="metric-unit text-rose-300/60">/ 100%</span>
+            </div>
+
+            <h3 className="font-semibold text-sm text-white tracking-tight">
+              Chaos Slashing & Anti-Fraud
+            </h3>
+            <p className="text-xs text-white/70 mt-1.5 leading-relaxed">
+              Rogue node submits corrupted digest. Escrow cancels payout, triggers 100% refund, and slashes node stake.
             </p>
           </div>
-          <ArrowRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-white transition-colors mt-0.5 flex-shrink-0" />
+
+          <div className="pt-4 border-t border-white/[0.08] mt-4 flex items-center justify-between">
+            <span className="pill-ghost text-[11px] py-1.5 px-3.5 group-hover:bg-rose-500 group-hover:text-white transition-all">
+              <span>Test Anti-Fraud</span>
+              <ArrowRight className="w-3 h-3 ml-1 group-hover:translate-x-0.5 transition-transform" />
+            </span>
+            <span className="text-[10px] font-mono text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
+              Stake Slashed
+            </span>
+          </div>
         </button>
       </div>
 
       {/* Main Console Workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* Left Column (5 cols): Task Dispatch */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="linear-card rounded-xl p-5 text-left space-y-4">
+        {/* Left Column (5 cols): Task Dispatch Panel */}
+        <div className="lg:col-span-5 space-y-6">
+          <div className="glass-card p-8 text-left space-y-5">
             
-            <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-              <span className="text-xs font-mono font-medium text-white uppercase tracking-tight">
-                Task Dispatch
-              </span>
-              <span className="text-[11px] font-mono text-slate-400">
-                Agent: Research-01
+            <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+              <div>
+                <span className="tag-label">Task Dispatch Control</span>
+                <h3 className="text-base font-semibold text-white tracking-tight mt-0.5">
+                  Autonomous Inference Dispatch
+                </h3>
+              </div>
+              <span className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-white/[0.06] text-white/70 border border-white/[0.12]">
+                Agent: Primary-01
               </span>
             </div>
 
-            {/* Prompt input */}
+            {/* Prompt input with Validation States */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                Instruction / Prompt
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs font-semibold text-white/90">
+                  Instruction / Prompt
+                </label>
+                {!isPromptEmpty && (
+                  <span className="flex items-center gap-1 text-[11px] font-mono text-emerald-400">
+                    <CheckCircle2 className="w-3 h-3" />
+                    <span>Valid</span>
+                  </span>
+                )}
+              </div>
               <textarea
                 rows={3}
                 value={prompt}
                 onChange={e => setPrompt(e.target.value)}
-                className="linear-input w-full rounded-lg p-3 text-xs text-slate-100 placeholder-slate-500 font-sans resize-none"
+                placeholder="Enter prompt instruction for autonomous compute node..."
+                className={`glass-input w-full rounded-2xl p-4 text-xs text-white placeholder-white/30 font-sans resize-none transition-all ${
+                  isPromptEmpty ? 'glass-input-error' : 'glass-input-success'
+                }`}
               />
+              {isPromptEmpty && (
+                <div className="flex items-center gap-1.5 text-xs text-[#FF758F] mt-2 font-medium animate-fadeIn">
+                  <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span>Prompt is required. Enter instructions to dispatch task.</span>
+                </div>
+              )}
             </div>
 
-            {/* Media preview */}
+            {/* Media input attachment */}
             <div>
-              <div className="flex items-center justify-between text-xs text-slate-300 mb-1.5">
+              <div className="flex items-center justify-between text-xs text-white/80 mb-2">
                 <span className="flex items-center gap-1.5">
-                  <ImageIcon className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Media Input</span>
+                  <ImageIcon className="w-3.5 h-3.5 text-white/50" />
+                  <span>Media Context</span>
                 </span>
                 <button
                   type="button"
                   onClick={() => setImageUrl(imageUrl ? undefined : SAMPLE_IMAGE_URL)}
-                  className="text-[11px] text-[#14F195] hover:underline"
+                  className="text-[11px] font-medium text-[#14F195] hover:underline cursor-pointer"
                 >
                   {imageUrl ? 'Remove image' : 'Attach sample image'}
                 </button>
               </div>
 
               {imageUrl && (
-                <div className="relative rounded-lg overflow-hidden border border-white/[0.08] h-28">
+                <div className="relative rounded-2xl overflow-hidden border border-white/[0.12] h-32 shadow-inner">
                   <img
                     src={imageUrl}
                     alt="Target scene"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded bg-black/70 text-[10px] font-mono text-slate-300">
+                  <div className="absolute bottom-2 left-2 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md text-[10px] font-mono text-white/80 border border-white/10">
                     City-Street-4K.jpg
                   </div>
                 </div>
@@ -466,31 +543,31 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
             </div>
 
             {/* Parameters */}
-            <div className="grid grid-cols-2 gap-2.5 pt-1">
+            <div className="grid grid-cols-2 gap-4 pt-1">
               <div>
-                <label className="block text-[11px] text-slate-400 mb-1 font-mono">Capability</label>
+                <label className="block text-[11px] text-white/60 mb-1.5 font-mono">Capability</label>
                 <select
                   value={taskType}
                   onChange={e => setTaskType(e.target.value as any)}
-                  className="linear-input w-full rounded-md px-2 py-1.5 text-xs text-white font-mono"
+                  className="glass-input w-full rounded-xl px-3 py-2 text-xs text-white font-mono cursor-pointer"
                 >
-                  <option value="vision">Vision-Language</option>
-                  <option value="llm">Deep Reasoning</option>
-                  <option value="code">Coding Analysis</option>
-                  <option value="audio">Audio / Whisper</option>
+                  <option value="vision" className="bg-[#0A0B10]">Vision-Language</option>
+                  <option value="llm" className="bg-[#0A0B10]">Deep Reasoning</option>
+                  <option value="code" className="bg-[#0A0B10]">Coding Analysis</option>
+                  <option value="audio" className="bg-[#0A0B10]">Audio / Whisper</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-[11px] text-slate-400 mb-1 font-mono">Priority</label>
-                <div className="flex bg-[#0A0B10] p-0.5 rounded-md border border-white/[0.08] text-[11px]">
+                <label className="block text-[11px] text-white/60 mb-1.5 font-mono">Routing Priority</label>
+                <div className="flex bg-white/[0.04] p-1 rounded-xl border border-white/[0.10] text-[11px]">
                   {(['latency', 'balanced', 'price'] as const).map(p => (
                     <button
                       key={p}
                       type="button"
                       onClick={() => setPriority(p)}
-                      className={`flex-1 py-1 rounded capitalize font-mono text-[10px] transition-colors ${
-                        priority === p ? 'bg-white/10 text-white font-medium' : 'text-slate-500'
+                      className={`flex-1 py-1.5 rounded-lg capitalize font-mono text-[10px] transition-all cursor-pointer ${
+                        priority === p ? 'bg-white text-[#0A0B10] font-bold shadow-sm' : 'text-white/60 hover:text-white'
                       }`}
                     >
                       {p}
@@ -500,16 +577,16 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
               </div>
             </div>
 
-            {/* Launch CTA */}
+            {/* Primary Launch CTA */}
             <button
-              disabled={isProcessing}
+              disabled={isProcessing || isPromptEmpty}
               onClick={() => runAutonomousWorkflow()}
-              className="w-full py-2.5 rounded-lg bg-white text-black font-semibold text-xs hover:bg-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+              className="pill-cta w-full py-4 text-sm font-semibold rounded-full mt-2 cursor-pointer"
             >
               {isProcessing ? (
                 <>
-                  <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                  <span>Executing M2M Escrow...</span>
+                  <div className="w-4 h-4 border-2 border-[#0A0B10] border-t-transparent rounded-full animate-spin" />
+                  <span>Clearing Micro-Escrow on Solana...</span>
                 </>
               ) : (
                 <span>Dispatch Autonomous Job</span>
@@ -517,22 +594,25 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
             </button>
           </div>
 
-          {/* Decision Summary */}
+          {/* Decision Scoring Summary */}
           {scoredDecision && (
-            <div className="linear-card rounded-xl p-4 text-left space-y-2">
+            <div className="glass-card p-6 text-left space-y-3">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-slate-400">Selected Provider</span>
-                <span className="text-[#14F195] font-semibold">{scoredDecision.selected.totalScore}/100</span>
+                <span className="text-white/60">Optimal Provider Selected</span>
+                <span className="text-[#14F195] font-bold px-2 py-0.5 rounded-full bg-[#14F195]/10 border border-[#14F195]/20">
+                  Score: {scoredDecision.selected.totalScore}/100
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-white">
                   {scoredDecision.selected.provider.name}
                 </span>
-                <span className="text-xs font-mono text-slate-300">
+                <span className="text-xs font-mono text-white/80 font-medium">
                   ${scoredDecision.selected.provider.pricePerRequest.toFixed(4)} USDC
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed font-mono pt-1 border-t border-white/[0.04]">
+              <div className="hairline-divider my-2" />
+              <p className="text-[11px] text-white/70 leading-relaxed font-mono">
                 {scoredDecision.explanation}
               </p>
             </div>
@@ -540,7 +620,7 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
         </div>
 
         {/* Right Column (7 cols): State Machine & Output */}
-        <div className="lg:col-span-7 space-y-4">
+        <div className="lg:col-span-7 space-y-6">
           
           <EscrowStateMachine
             status={currentJob ? currentJob.status : 'idle'}
@@ -551,67 +631,71 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
 
           {/* Results Card */}
           {currentJob && currentJob.outputResult && (
-            <div className="linear-card rounded-xl p-4 text-left space-y-3">
-              <div className="flex items-center justify-between pb-2.5 border-b border-white/[0.06]">
-                <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${currentJob.status === 'settled' ? 'bg-[#14F195]' : 'bg-rose-400'}`} />
-                  <span className="text-xs font-mono font-medium text-white uppercase">
-                    {currentJob.status === 'settled' ? 'Verified Inference Result' : 'Verification Exception'}
+            <div className="glass-card p-8 text-left space-y-5">
+              <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+                <div className="flex items-center gap-2.5">
+                  <span className={`w-2.5 h-2.5 rounded-full ${
+                    currentJob.status === 'settled' 
+                      ? 'bg-[#14F195] shadow-[0_0_10px_#14F195]' 
+                      : 'bg-rose-400 shadow-[0_0_10px_#F43F5E]'
+                  }`} />
+                  <span className="text-xs font-mono font-semibold text-white uppercase tracking-wider">
+                    {currentJob.status === 'settled' ? 'Verified Inference Receipt' : 'Cryptographic Verification Exception'}
                   </span>
                 </div>
-                <span className={`text-[10px] font-mono px-2 py-0.5 rounded border uppercase font-medium ${
+                <span className={`text-[10px] font-mono px-3 py-1 rounded-full border uppercase font-bold tracking-wide ${
                   currentJob.status === 'settled'
-                    ? 'bg-[#14F195]/10 text-[#14F195] border-[#14F195]/20'
-                    : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                    ? 'bg-[#14F195]/15 text-[#14F195] border-[#14F195]/30 shadow-[0_0_12px_rgba(20,241,149,0.2)]'
+                    : 'bg-rose-500/15 text-rose-400 border-rose-500/30 shadow-[0_0_12px_rgba(244,63,94,0.2)]'
                 }`}>
-                  {currentJob.status === 'settled' ? 'Settled' : 'Refunded'}
+                  {currentJob.status === 'settled' ? 'Settled on Solana' : 'Auto-Refunded (100%)'}
                 </span>
               </div>
 
               {/* Output text */}
-              <div className="p-3 rounded-lg bg-[#0A0B10] border border-white/[0.06] text-xs font-mono text-slate-300 whitespace-pre-wrap leading-relaxed">
+              <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.10] text-xs font-mono text-white/90 whitespace-pre-wrap leading-relaxed shadow-inner">
                 {currentJob.outputResult}
               </div>
 
               {/* Verification checks */}
               {currentJob.verificationChecks && (
-                <div className="bg-[#0A0B10] border border-white/[0.04] rounded-lg p-2.5 text-[11px] font-mono">
+                <div className="bg-white/[0.03] border border-white/[0.10] rounded-2xl p-4 text-[11px] font-mono">
                   <button
                     onClick={() => setShowVerificationDetails(!showVerificationDetails)}
-                    className="w-full flex items-center justify-between text-slate-400 mb-1.5"
+                    className="w-full flex items-center justify-between text-white/70 hover:text-white cursor-pointer transition-colors mb-2"
                   >
-                    <span className="flex items-center gap-1.5 text-slate-200">
-                      <ShieldCheck className="w-3.5 h-3.5 text-[#14F195]" />
-                      <span>Cryptographic Invariants</span>
+                    <span className="flex items-center gap-2 text-white font-medium">
+                      <ShieldCheck className="w-4 h-4 text-[#14F195]" />
+                      <span>6-Point Cryptographic Invariant Gates</span>
                     </span>
-                    {showVerificationDetails ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                    {showVerificationDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </button>
 
                   {showVerificationDetails && (
-                    <div className="grid grid-cols-2 gap-1.5 pt-1 text-slate-400">
-                      <div className="flex items-center gap-1.5">
-                        <CheckCircle2 className={`w-3 h-3 ${currentJob.verificationChecks.providerAuthenticated ? 'text-[#14F195]' : 'text-rose-400'}`} />
-                        <span>Provider Authenticated</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-white/[0.06] text-white/80">
+                      <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/[0.02]">
+                        <CheckCircle2 className={`w-3.5 h-3.5 flex-shrink-0 ${currentJob.verificationChecks.providerAuthenticated ? 'text-[#14F195]' : 'text-rose-400'}`} />
+                        <span>Ed25519 Provider Signature</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <CheckCircle2 className={`w-3 h-3 ${currentJob.verificationChecks.jobIdMatched ? 'text-[#14F195]' : 'text-rose-400'}`} />
-                        <span>Job ID & PDA Matched</span>
+                      <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/[0.02]">
+                        <CheckCircle2 className={`w-3.5 h-3.5 flex-shrink-0 ${currentJob.verificationChecks.jobIdMatched ? 'text-[#14F195]' : 'text-rose-400'}`} />
+                        <span>Anchor Escrow PDA Match</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <CheckCircle2 className={`w-3 h-3 ${currentJob.verificationChecks.outputReceived ? 'text-[#14F195]' : 'text-rose-400'}`} />
-                        <span>Non-Empty Payload</span>
+                      <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/[0.02]">
+                        <CheckCircle2 className={`w-3.5 h-3.5 flex-shrink-0 ${currentJob.verificationChecks.outputReceived ? 'text-[#14F195]' : 'text-rose-400'}`} />
+                        <span>Non-Empty Payload Verified</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <CheckCircle2 className={`w-3 h-3 ${currentJob.verificationChecks.schemaValid ? 'text-[#14F195]' : 'text-rose-400'}`} />
-                        <span>Schema Validation</span>
+                      <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/[0.02]">
+                        <CheckCircle2 className={`w-3.5 h-3.5 flex-shrink-0 ${currentJob.verificationChecks.schemaValid ? 'text-[#14F195]' : 'text-rose-400'}`} />
+                        <span>RFC-402 JSON Schema Match</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <CheckCircle2 className={`w-3 h-3 ${currentJob.verificationChecks.latencyWithinSla ? 'text-[#14F195]' : 'text-rose-400'}`} />
-                        <span>Latency SLA Met</span>
+                      <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/[0.02]">
+                        <CheckCircle2 className={`w-3.5 h-3.5 flex-shrink-0 ${currentJob.verificationChecks.latencyWithinSla ? 'text-[#14F195]' : 'text-rose-400'}`} />
+                        <span>Latency SLA Bound Satisfied</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <CheckCircle2 className={`w-3 h-3 ${currentJob.verificationChecks.sha256HashValid ? 'text-[#14F195]' : 'text-rose-400'}`} />
-                        <span>SHA-256 Digest Match</span>
+                      <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/[0.02]">
+                        <CheckCircle2 className={`w-3.5 h-3.5 flex-shrink-0 ${currentJob.verificationChecks.sha256HashValid ? 'text-[#14F195]' : 'text-rose-400'}`} />
+                        <span>SHA-256 Digest Invariant</span>
                       </div>
                     </div>
                   )}
@@ -619,14 +703,16 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({
               )}
 
               {/* Solana Explorer link */}
-              <div className="flex items-center justify-between text-[11px] font-mono pt-1 text-slate-400">
-                <span>PDA: {shortenAddress(currentJob.escrowPda || '', 4)}</span>
+              <div className="flex flex-wrap items-center justify-between gap-3 text-[11px] font-mono pt-1 text-white/60">
+                <span className="px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.10]">
+                  PDA: <span className="text-white font-medium">{shortenAddress(currentJob.escrowPda || '', 4)}</span>
+                </span>
                 {currentJob.transactionSignature && (
                   <a
                     href={getSolanaExplorerUrl(currentJob.transactionSignature, 'tx')}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-1 text-[#14F195] hover:underline"
+                    className="pill-ghost text-xs py-1.5 px-3.5 flex items-center gap-1.5 hover:bg-white hover:text-black transition-all"
                   >
                     <span>View on Solana Explorer</span>
                     <ExternalLink className="w-3 h-3" />
