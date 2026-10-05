@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #08090D;
+    color: #EDEDED;
+    overflow-x: hidden;
+    letter-spacing: -0.011em;
+  }
+
+  code, pre, .font-mono {
+    font-family: var(--font-mono);
+  }
+}
+
+/* Subtle, high-end scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #08090D;
+}
+::-webkit-scrollbar-thumb {
+  background: #1A1D27;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #282D3D;
+}
+
+/* Linear & Stripe inspired cards */
+.linear-card {
+  background: #0E1017;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.linear-card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.linear-card-interactive {
+  background: #0E1017;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  transition: all 0.15s ease;
+}
+
+.linear-card-interactive:hover {
+  background: #12151F;
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Input styles */
+.linear-input {
+  background: #0A0B10;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #EDEDED;
+  transition: all 0.15s ease;
+}
+
+.linear-input:focus {
+  border-color: rgba(255, 255, 255, 0.25);
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+/* Ambient glow accents */
+.ambient-glow-top {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(20, 241, 149, 0.04) 0%, rgba(153, 69, 255, 0.03) 40%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
